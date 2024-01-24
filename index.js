@@ -6,7 +6,7 @@ const path = require('path');
 // const db = require("./config/mongoose");
 const Admin = require('./models/admin');
 
-const mongoose = require('mongoose');
+
 const mongoose = require('mongoose');
 mongoose.connect(("mongodb+srv://paghadalavadhpaghadalavadh607:avadh123cluster@cluster0.0ps7jfm.mongodb.net/Ecommerce"), {
     useUnifiedTopology: true,
