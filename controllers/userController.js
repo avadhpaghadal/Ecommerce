@@ -4,6 +4,7 @@ const extracategory = require('../models/extra_category');
 const product = require('../models/product');
 const user = require('../models/user');
 const cart = require('../models/cart');
+const order = require('../models/order');
 const bcrypt = require('bcrypt');
 var stripe = require('stripe')("sk_test_wFSjCKx4AW07JCc87b2fUwhH00zzjnRSJv");
 
@@ -346,7 +347,7 @@ module.exports.payment = async(req,res)=>{
         req.body.cartID = cartID;
         req.body.status = 'confirm';
 
-        var upcart =  await cart.create(req.body);
+        var upcart =  await order.create(req.body);
         if(upcart){
             cartPendingData.map(async(v,i)=>{
                 await cart.findByIdAndUpdate(v.id,{status:"confirm"})
