@@ -33,59 +33,65 @@ module.exports.home = async (req,res)=>{
 }
 
 module.exports.productList = async (req,res)=>{
-    let categoryData = await category.find({});
-    let subcatData = await subcategory.find({});
-    let extracatData = await extracategory.find({});
-    let proData = await product.find({'procat_name':req.params.catId,'proSubCat_name':req.params.subId,'proExtra_name':req.params.extraId}).populate('probrand_name').exec();
+    try{
+        let categoryData = await category.find({});
+        let subcatData = await subcategory.find({});
+        let extracatData = await extracategory.find({});
+        let proData = await product.find({'procat_name':req.params.catId,'proSubCat_name':req.params.subId,'proExtra_name':req.params.extraId}).populate('probrand_name').exec();
 
-    let countCart;
-    if(req.user){
-        countCart = await cart.find({userId:req.user.id,status:'pending'}).countDocuments();
+        let countCart;
+        if(req.user){
+            countCart = await cart.find({userId:req.user.id,status:'pending'}).countDocuments();
+        }
+
+        let proprice = [];
+        let brandname = [];
+        let color = [];
+    
+        proData.forEach((v,i)=>{
+            proprice.push(parseInt(v.product_price));
+            color.push({name : v.product_color, id : v.id});
+            let pos = brandname.findIndex((v1,i1)=>{v1.id==v.probrand_name.id});
+            if(pos == -1){
+                brandname.push({id : v.probrand_name.id, name : v.probrand_name.brand_name});
+            }
+        })
+
+        var brandNew = [];
+        brandname.map((v,i)=>{
+            let pos = brandNew.findIndex((v1,i1)=>v1.name == v.name);
+            if(pos == -1){
+                brandNew.push(v);
+            }
+        })
+
+        var colorNew = [];
+        color.map((v,i)=>{
+            let pos = colorNew.findIndex((v1,i1)=>v1.name == v.name);
+            if(pos == -1){
+                colorNew.push(v);
+            }
+        })
+
+        var max = Math.max(...proprice);
+        var min = Math.min(...proprice);
+
+        return res.render('userPanel/productList',{
+            'categoryData' : categoryData,
+            'subcatData' : subcatData,
+            'extracatData' : extracatData,
+            'proData' : proData,
+            'max' : max,
+            'min' : min,
+            'brandList' : brandNew,
+            'colorList' : colorNew,
+            'countCart' : countCart?countCart:0,
+        });
     }
-
-    let proprice = [];
-    let brandname = [];
-    let color = [];
-   
-    proData.forEach((v,i)=>{
-        proprice.push(parseInt(v.product_price));
-        color.push({name : v.product_color, id : v.id});
-        let pos = brandname.findIndex((v1,i1)=>{v1.id==v.probrand_name.id});
-        if(pos == -1){
-            brandname.push({id : v.probrand_name.id, name : v.probrand_name.brand_name});
-        }
-    })
-
-    var brandNew = [];
-    brandname.map((v,i)=>{
-        let pos = brandNew.findIndex((v1,i1)=>v1.name == v.name);
-        if(pos == -1){
-            brandNew.push(v);
-        }
-    })
-
-    var colorNew = [];
-    color.map((v,i)=>{
-        let pos = colorNew.findIndex((v1,i1)=>v1.name == v.name);
-        if(pos == -1){
-            colorNew.push(v);
-        }
-    })
-
-    var max = Math.max(...proprice);
-    var min = Math.min(...proprice);
-
-    return res.render('userPanel/productList',{
-        'categoryData' : categoryData,
-        'subcatData' : subcatData,
-        'extracatData' : extracatData,
-        'proData' : proData,
-        'max' : max,
-        'min' : min,
-        'brandList' : brandNew,
-        'colorList' : colorNew,
-        'countCart' : countCart?countCart:0,
-    });
+    catch(err){
+        console.log(err);
+        return res.redirect('back')
+    }
 }
 
 

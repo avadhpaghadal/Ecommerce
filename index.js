@@ -33,6 +33,10 @@ const session = require('express-session');
 const passport = require('passport');
 const passportlocal = require('./config/passport_local_strategy');
 
+// google Login
+const googleauth = require('./config/googleStrategy');
+const google = require('passport-google-oauth20');
+const userGoogle = require('./config/userGoogleStrategy');
 
 var Publishable_Key = 'pk_test_5RzHjUwGCx0aBvQYxmMprB1200k4WeKjIa'
 var Secret_Key = 'sk_test_wFSjCKx4AW07JCc87b2fUwhH00zzjnRSJv'

@@ -6,6 +6,10 @@ const Admin = require('../models/admin');
 const passport = require('passport');
 const passportlocal = require('../config/passport_local_strategy');
 
+
+
+
+
 routes.get('/', async(req,res)=>{
     if(req.cookies.adminName){
         return res.redirect("/admin/deshboard");
@@ -63,7 +67,9 @@ routes.get("/logout",async(req,res)=>{
     return res.redirect("/admin");
 })
 
-
+// Login With Google
+routes.get('/google',passport.authenticate('google',{scope : ['profile','email']}));
+routes.get('/google/callback',passport.authenticate('google',{failureRedirect :'/admin/login'}),adminController.checklogin);
 
 ////  Routing ////
 routes.use("/category",passport.checkAuthentication,require('./category'));
